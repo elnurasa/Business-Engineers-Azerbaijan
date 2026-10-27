@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="az">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Business Engineers Azerbaijan | Konsaltinq</title>
+<meta name="description" content="Business Engineers Azerbaijan: HR transformasiyası, təşkilati dizayn və inkişaf, biznes proses idarəetməsi (BPM), data və analitika, rəqəmsal transformasiya üzrə konsaltinq.">
+<meta name="theme-color" content="#1A0D47">
+<link rel="icon" href="assets/bea-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&family=Inter:wght@400;500&display=swap">
+<link rel="stylesheet" href="styles.css?v=14one">
+</head>
+<body>
+<a class="skip" href="#labels">Xidmətlərə keç</a>
+
+<header class="top">
+  <button id="menu" class="burger" type="button" aria-label="Menyunu aç" aria-expanded="false" aria-controls="scene-nav">
+    <span></span><span></span><span></span>
+  </button>
+  <a class="brand" href="./" aria-label="Business Engineers Azerbaijan, ana səhifə"><img src="assets/bea-logo.png" alt="Business Engineers Azerbaijan"></a>
+</header>
+
+<main>
+  <section id="scene-orbit" class="scene on" aria-label="Xidmət orbiti">
+    <div class="bg" aria-hidden="true"></div>
+    <canvas id="orbitCv" aria-hidden="true"></canvas>
+    <div class="grain" aria-hidden="true"></div>
+    <h1 class="sr-only">Business Engineers Azerbaijan: konsaltinq xidmətləri</h1>
+    <div id="labels" role="group" aria-label="Beş xidmət istiqaməti orbitdə fırlanır. Birini seçin."></div>
+    <button id="core" class="core ring" type="button" aria-label="BEA-nı kəşf et">
+      <svg class="rtext" viewBox="0 0 200 200" aria-hidden="true"><defs><path id="corePath" d="M100,100 m-80,0 a80,80 0 1,1 160,0 a80,80 0 1,1 -160,0"/></defs><text><textPath href="#corePath" textLength="500" lengthAdjust="spacing">BEA-NI KƏŞF ET  •  BEA-NI KƏŞF ET  •  </textPath></text></svg>
+      <span class="dot"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    </button>
+
+    <aside id="svcPanel" class="panel svc" role="dialog" aria-labelledby="svcTitle" aria-hidden="true">
+      <button class="x" type="button" id="svcClose" aria-label="Bağla"><span></span><span></span></button>
+      <p class="eyebrow" id="svcCat"></p>
+      <h2 id="svcTitle"></h2>
+      <p id="svcDesc"></p>
+      <ul class="subs" id="svcSubs"></ul>
+      <p class="outcome" id="svcOut"></p>
+      <p class="meta" id="svcMeta"></p>
+      <div class="row">
+        <button class="cta" type="button" id="svcCta">Konsultasiya sifariş et</button>
+      </div>
+    </aside>
+  </section>
+
+  <section id="scene-nav" class="scene" aria-label="Naviqasiya" aria-hidden="true">
+    <div class="bg navbg" aria-hidden="true"></div>
+    <svg id="navSvg" xmlns="http://www.w3.org/2000/svg" role="tablist" aria-label="Bölmələr">
+      <g id="navArcs" aria-hidden="true"></g>
+      <g id="navChips"></g>
+    </svg>
+    <button id="back" class="back" type="button"><i aria-hidden="true">←</i> Orbitə qayıt</button>
+    <div class="navfoot"><a href="mailto:info@bea.az">info@bea.az</a><span aria-hidden="true">·</span><a href="tel:+994504441050">+994 50 444 10 50</a></div>
+    <article id="navPanel" class="panel nav" tabindex="-1" aria-live="polite"></article>
+  </section>
+</main>
+
+<script src="data.js?v=14one"></script>
+<script src="app.js?v=14one"></script>
+</body>
+</html>

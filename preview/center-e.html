@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="az">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>E variantının versiyaları</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;800&family=Inter:wght@400;600&display=swap">
+<style>
+  body{margin:0;background:#0B0626;color:#F2E8FF;font-family:Inter,system-ui,sans-serif;padding:24px}
+  h1{font:800 22px 'Plus Jakarta Sans',sans-serif;margin:0 0 6px}
+  p.s{margin:0 0 16px;color:#CDBDF0;font-size:14px}
+  .g{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px}
+  .c{border:1px solid rgba(192,128,240,.35);border-radius:16px;overflow:hidden;background:#140B3A}
+  canvas{display:block;width:100%;height:auto;cursor:crosshair}
+  .c div{padding:12px 14px}
+  .c b{display:block;font:600 15px 'Plus Jakarta Sans',sans-serif;margin-bottom:4px}
+  .c span{font-size:13px;color:#CDBDF0;line-height:1.5}
+</style>
+</head>
+<body>
+<h1>E variantı: zərrəciklərdən BEA</h1>
+<p class="s">Beş fərqli versiya. E4-də kursoru hərflərin üstündə gəzdirin.</p>
+<div class="g" id="g"></div>
+<script>
+(function () {
+  var D = [
+    ['E1. Xidmət ikonlarına çevrilmə', 'BEA sözü növbə ilə xidmət ikonlarına çevrilir və geri qayıdır (bəyəndiyiniz versiya).'],
+    ['E2. Canlı loqo + partlayış', 'Zərrəciklər BEA, swoosh və ulduzdan ibarət loqo formasını yaradır, arabir orbitə doğru səpələnib geri yığılır.'],
+    ['E3. Xidmət qısaltmaları', 'BEA növbə ilə HR, OD, BPM, DATA, DIGITAL sözlərinə çevrilir. Mərkəz xidmətləri birbaşa "deyir".'],
+    ['E4. Canlı və interaktiv', 'Hərflər yerində kiçik dairələrlə "nəfəs alır", kursor yaxınlaşanda zərrəciklər kənara qaçır.'],
+    ['E5. Orbitdən yığılma', 'Zərrəciklər orbitdən axıb gəlir, BEA-nı yaradır, bir müddət parlayır, sonra yenə orbitə qayıdır. Rəng bənövşəyidən maqentaya keçir.']
+  ];
+  var g = document.getElementById('g'), C = [], M = [];
+  D.forEach(function (d, i) {
+    var c = document.createElement('div'); c.className = 'c';
+    var cv = document.createElement('canvas'); cv.width = 600; cv.height = 380; c.appendChild(cv);
+    var t = document.createElement('div'); var b = document.createElement('b'); b.textContent = d[0]; var s = document.createElement('span'); s.textContent = d[1];
+    t.appendChild(b); t.appendChild(s); c.appendChild(t); g.appendChild(c); C.push(cv.getContext('2d'));
+    var m = { x: -999, y: -999 }; M.push(m);
+    cv.addEventListener('pointermove', function (e) { var r = cv.getBoundingClientRect(); m.x = (e.clientX - r.left) / r.width * 600; m.y = (e.clientY - r.top) / r.height * 380; });
+    cv.addEventListener('pointerleave', function () { m.x = -999; m.y = -999; });
+  });
+  var W = 600, H = 380, cx = 300, cy = 190, TAU = Math.PI * 2;
+  function rnd(a, b) { return a + Math.random() * (b - a); }
+  var stars = []; for (var i = 0; i < 70; i++) stars.push([Math.random() * W, Math.random() * H, rnd(.3, 1.3), Math.random() * 6]);
+  var dust = []; for (i = 0; i < 320; i++) dust.push([i % 2, Math.random() * TAU, rnd(-6, 6), rnd(.4, 1.5)]);
+  var R = [[165, 62], [270, 112]];
+  function bg(x, t) {
+    var gr = x.createRadialGradient(cx, cy, 0, cx, cy, 400); gr.addColorStop(0, '#2B1668'); gr.addColorStop(.45, '#1A0D47'); gr.addColorStop(1, '#0B0626');
+    x.fillStyle = gr; x.fillRect(0, 0, W, H); x.globalCompositeOperation = 'lighter';
+    stars.forEach(function (s) { x.fillStyle = 'rgba(255,255,255,' + (.2 + .3 * (.5 + .5 * Math.sin(t + s[3]))).toFixed(2) + ')'; x.fillRect(s[0], s[1], s[2], s[2]); });
+    dust.forEach(function (q) { var rg = R[q[0]], th = q[1] + t * (q[0] ? .03 : -.04), d = (Math.sin(th) + 1) / 2; x.fillStyle = 'rgba(238,218,255,' + (.18 + .4 * d).toFixed(2) + ')'; x.beginPath(); x.arc(cx + (rg[0] + q[2]) * Math.cos(th), cy + (rg[1] + q[2] * .5) * Math.sin(th), q[3] * (.6 + .6 * d), 0, TAU); x.fill(); });
+    x.globalCompositeOperation = 'source-over';
+  }
+  function halo(x, r, a) { x.globalCompositeOperation = 'lighter'; var h = x.createRadialGradient(cx, cy, 0, cx, cy, r); h.addColorStop(0, 'rgba(176,96,224,' + a + ')'); h.addColorStop(1, 'rgba(176,96,224,0)'); x.fillStyle = h; x.beginPath(); x.arc(cx, cy, r, 0, TAU); x.fill(); x.globalCompositeOperation = 'source-over'; }
+  function dot(x, X, Y, r, col, a) { x.fillStyle = 'rgba(' + col + ',' + Math.max(0, Math.min(1, a)).toFixed(2) + ')'; x.beginPath(); x.arc(X, Y, r, 0, TAU); x.fill(); }
+  function star4(x, X, Y, r, a) { x.beginPath(); x.moveTo(X, Y - r); x.quadraticCurveTo(X + r * .12, Y - r * .12, X + r, Y); x.quadraticCurveTo(X + r * .12, Y + r * .12, X, Y + r); x.quadraticCurveTo(X - r * .12, Y + r * .12, X - r, Y); x.quadraticCurveTo(X - r * .12, Y - r * .12, X, Y - r); x.fillStyle = 'rgba(255,250,255,' + a + ')'; x.fill(); }
+
+  /* sample shapes into point clouds */
+  function sample(draw, step) {
+    var o = document.createElement('canvas'); o.width = 260; o.height = 140; var c = o.getContext('2d');
+    c.fillStyle = '#fff'; c.strokeStyle = '#fff'; c.lineCap = 'round'; draw(c);
+    var d = c.getImageData(0, 0, 260, 140).data, P = [];
+    for (var y = 0; y < 140; y += step) for (var xx = 0; xx < 260; xx += step) if (d[(y * 260 + xx) * 4 + 3] > 128) P.push([xx - 130, y - 70]);
+    return P.length ? P : [[0, 0]];
+  }
+  function word(w, size) { return sample(function (c) { c.font = "800 " + size + "px 'Plus Jakarta Sans', 'Arial Black', Arial, sans-serif"; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(w, 130, 72); }, 3); }
+  var BEA = word('BEA', 96);
+  var ICONS = [
+    sample(function (c) { c.lineWidth = 8; c.beginPath(); c.arc(105, 46, 18, 0, TAU); c.stroke(); c.beginPath(); c.arc(105, 118, 40, Math.PI, TAU); c.stroke(); c.beginPath(); c.arc(158, 50, 14, 0, TAU); c.stroke(); c.beginPath(); c.arc(158, 112, 30, Math.PI * 1.1, TAU); c.stroke(); }, 3),
+    sample(function (c) { c.fillRect(82, 70, 26, 52); c.fillRect(118, 26, 26, 96); c.fillRect(154, 54, 26, 68); }, 3),
+    sample(function (c) { c.lineWidth = 8; c.beginPath(); c.arc(130, 70, 44, .4, Math.PI * 1.9); c.stroke(); c.beginPath(); c.moveTo(174, 28); c.lineTo(176, 56); c.lineTo(148, 54); c.stroke(); }, 3)
+  ];
+  var ABBR = [word('HR', 92), word('OD', 92), word('BPM', 84), word('DATA', 70), word('DIGITAL', 46)];
+  var LOGO = sample(function (c) {
+    c.font = "800 84px 'Plus Jakarta Sans', 'Arial Black', Arial, sans-serif"; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('BEA', 130, 64);
+    c.lineWidth = 7; c.beginPath(); c.ellipse(130, 82, 116, 22, -0.12, Math.PI * 0.62, Math.PI * 2.08); c.stroke();
+    c.beginPath(); c.moveTo(232, 52); c.lineTo(236, 62); c.lineTo(246, 66); c.lineTo(236, 70); c.lineTo(232, 80); c.lineTo(228, 70); c.lineTo(218, 66); c.lineTo(228, 62); c.closePath(); c.fill();
+  }, 3);
+  function pick(P, i, N) { return P[Math.floor(i * P.length / N)]; }
+  function mk(n) { var a = []; for (var i = 0; i < n; i++) a.push({ x: rnd(-200, 200), y: rnd(-120, 120), ph: Math.random() * 6, r: rnd(1, 1.6), o: Math.random() * TAU }); return a; }
+  function ease(f) { f = Math.max(0, Math.min(1, f)); return f < .5 ? 2 * f * f : 1 - Math.pow(-2 * f + 2, 2) / 2; }
+  var S = 1.35;
+  var P1 = mk(700), P2 = mk(800), P3 = mk(700), P4 = mk(700), P5 = mk(700);
+
+  var V = [
+    /* E1 */
+    function (x, t) {
+      var seq = [BEA, ICONS[0], BEA, ICONS[1], BEA, ICONS[2]], cyc = t / 2.8, k = Math.floor(cyc) % seq.length, ph = cyc - Math.floor(cyc);
+      var A = seq[k], B = seq[(k + 1) % seq.length], e = ease((ph - .6) / .4), N = P1.length;
+      halo(x, 120, .3); x.globalCompositeOperation = 'lighter';
+      P1.forEach(function (p, i) { var a = pick(A, i, N), b = pick(B, i, N); p.x += (a[0] + (b[0] - a[0]) * e - p.x) * .12; p.y += (a[1] + (b[1] - a[1]) * e - p.y) * .12; dot(x, cx + p.x * S, cy + p.y * S, p.r, '240,222,255', .55 + .4 * Math.sin(t * 3 + p.ph)); });
+      x.globalCompositeOperation = 'source-over';
+    },
+    /* E2 */
+    function (x, t) {
+      var cyc = (t % 7) / 7, N = P2.length;
+      halo(x, 140, .32); x.globalCompositeOperation = 'lighter';
+      P2.forEach(function (p, i) {
+        var a = pick(LOGO, i, N), tx = a[0], ty = a[1];
+        if (cyc > .62 && cyc < .82) { var th = p.o + t * .4, rg = R[i % 2]; tx = (rg[0] * Math.cos(th)) / S; ty = (rg[1] * Math.sin(th)) / S; }
+        var k = cyc > .62 && cyc < .82 ? .06 : .09;
+        p.x += (tx - p.x) * k; p.y += (ty - p.y) * k;
+        var col = a[0] > 90 && a[1] < 10 ? '255,248,255' : '235,212,255';
+        dot(x, cx + p.x * S, cy + p.y * S, p.r, col, .6 + .35 * Math.sin(t * 3 + p.ph));
+      });
+      x.globalCompositeOperation = 'source-over';
+      if (cyc < .6) { var sx = cx + 102 * S, sy = cy - 4 * S; halo2(x, sx, sy, 26, .5 + .3 * Math.sin(t * 4)); star4(x, sx, sy, 7 + 2 * Math.sin(t * 4), .9); }
+    },
+    /* E3 */
+    function (x, t) {
+      var seq = [BEA, ABBR[0], BEA, ABBR[1], BEA, ABBR[2], BEA, ABBR[3], BEA, ABBR[4]], cyc = t / 2.4, k = Math.floor(cyc) % seq.length, ph = cyc - Math.floor(cyc);
+      var A = seq[k], B = seq[(k + 1) % seq.length], e = ease((ph - .6) / .4), N = P3.length;
+      halo(x, 120, .3); x.globalCompositeOperation = 'lighter';
+      P3.forEach(function (p, i) { var a = pick(A, i, N), b = pick(B, i, N); p.x += (a[0] + (b[0] - a[0]) * e - p.x) * .12; p.y += (a[1] + (b[1] - a[1]) * e - p.y) * .12; dot(x, cx + p.x * S, cy + p.y * S, p.r, '240,222,255', .55 + .4 * Math.sin(t * 3 + p.ph)); });
+      x.globalCompositeOperation = 'source-over';
+    },
+    /* E4 */
+    function (x, t, m) {
+      var N = P4.length; halo(x, 130, .32 + .06 * Math.sin(t * 1.5)); x.globalCompositeOperation = 'lighter';
+      P4.forEach(function (p, i) {
+        var a = pick(BEA, i, N), sw = 2.2 + 1.2 * Math.sin(p.ph), tx = a[0] + Math.cos(t * 1.6 + p.o) * sw, ty = a[1] + Math.sin(t * 1.6 + p.o) * sw;
+        var px = cx + p.x * S, py = cy + p.y * S, dx = px - m.x, dy = py - m.y, dd = Math.hypot(dx, dy);
+        if (dd < 70) { var f = (1 - dd / 70) * 16; p.x += dx / dd * f / S; p.y += dy / dd * f / S; }
+        p.x += (tx - p.x) * .08; p.y += (ty - p.y) * .08;
+        dot(x, cx + p.x * S, cy + p.y * S, p.r, '240,222,255', .55 + .4 * Math.sin(t * 3 + p.ph));
+      });
+      x.globalCompositeOperation = 'source-over';
+    },
+    /* E5 */
+    function (x, t) {
+      var cyc = (t % 8) / 8, N = P5.length, gather = cyc < .3 ? ease(cyc / .3) : cyc < .75 ? 1 : 1 - ease((cyc - .75) / .25);
+      halo(x, 130, .15 + .25 * gather); x.globalCompositeOperation = 'lighter';
+      P5.forEach(function (p, i) {
+        var a = pick(BEA, i, N), rg = R[i % 2], th = p.o + t * (i % 2 ? .05 : -.07), ox = rg[0] * Math.cos(th) / S, oy = rg[1] * Math.sin(th) / S;
+        var lag = Math.max(0, Math.min(1, gather * 1.25 - (i / N) * .25));
+        var tx = ox + (a[0] - ox) * lag, ty = oy + (a[1] - oy) * lag;
+        p.x += (tx - p.x) * .2; p.y += (ty - p.y) * .2;
+        var f = (a[0] + 130) / 260, col = Math.round(235 + (232 - 235) * f) + ',' + Math.round(218 - 110 * f) + ',' + Math.round(255 - 20 * f);
+        dot(x, cx + p.x * S, cy + p.y * S, p.r * (0.8 + .3 * lag), col, (.45 + .45 * Math.sin(t * 3 + p.ph)) * (.6 + .4 * lag));
+      });
+      x.globalCompositeOperation = 'source-over';
+    }
+  ];
+  function halo2(x, X, Y, r, a) { x.globalCompositeOperation = 'lighter'; var h = x.createRadialGradient(X, Y, 0, X, Y, r); h.addColorStop(0, 'rgba(220,170,255,' + a + ')'); h.addColorStop(1, 'rgba(220,170,255,0)'); x.fillStyle = h; x.beginPath(); x.arc(X, Y, r, 0, TAU); x.fill(); x.globalCompositeOperation = 'source-over'; }
+  var L = null, T = 0;
+  function frame(n) {
+    if (L === null) L = n;
+    T += Math.max(0, Math.min(0.1, (n - L) / 1000)); L = n;
+    C.forEach(function (x, i) { try { bg(x, T); V[i](x, T, M[i]); } catch (err) { console.error(err); } });
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

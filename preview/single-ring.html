@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="az">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tək halqa variantları</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600&display=swap">
+<style>
+  body{margin:0;background:#0B0626;color:#F2E8FF;font-family:Inter,system-ui,sans-serif;padding:24px}
+  h1{font:800 22px 'Plus Jakarta Sans',sans-serif;margin:0 0 6px}
+  p.s{margin:0 0 16px;color:#CDBDF0;font-size:14px}
+  .g{display:grid;grid-template-columns:repeat(auto-fit,minmax(560px,1fr));gap:18px}
+  .c{border:1px solid rgba(192,128,240,.35);border-radius:16px;overflow:hidden;background:#140B3A}
+  .demo{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden}
+  .demo canvas{position:absolute;inset:0;width:100%;height:100%}
+  .ov{position:absolute;inset:0}
+  .it{position:absolute;left:0;top:0;will-change:transform;display:flex;align-items:center;gap:8px;width:156px;height:40px;box-sizing:border-box;padding:0 12px 0 5px;border-radius:22px;background:rgba(26,12,70,.78);border:1px solid rgba(200,160,255,.45);box-shadow:0 0 18px rgba(176,96,224,.35)}
+  .it .ic{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#9050D0,#C43FBE);display:flex;align-items:center;justify-content:center;color:#fff;flex:none}
+  .it .ic svg{width:14px;height:14px}
+  .it strong{font:600 11.5px/1.2 'Plus Jakarta Sans';color:#fff}
+  .info{padding:12px 14px}
+  .info b{display:block;font:700 15px 'Plus Jakarta Sans',sans-serif;margin-bottom:4px}
+  .info span{font-size:13px;color:#CDBDF0;line-height:1.5}
+</style>
+</head>
+<body>
+<h1>Tək halqa: boş görünməməsi üçün variantlar</h1>
+<p class="s">Hər variantda yalnız bir orbit halqası var, əlavə element fərqlidir.</p>
+<div class="g" id="g"></div>
+<script>
+(function () {
+  var SV = [
+    ['HR transformasiyası', 'M9 7m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M3 20v-1a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v1M16 4a3 3 0 0 1 0 6M21 20v-1a4 4 0 0 0-3-3.9'],
+    ['Təşkilati dizayn və inkişaf', 'M9 3h6v4H9zM12 7v4M5 15v-2a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2M3 15h4v4H3zM17 15h4v4h-4zM10 15h4v4h-4zM12 11v4'],
+    ['Biznes proses idarəetməsi (BPM)', 'M4 12a8 8 0 0 1 14-5.3M20 4v4h-4M20 12a8 8 0 0 1-14 5.3M4 20v-4h4'],
+    ['Data və analitika', 'M4 20V10h4v10zM10 20V4h4v16zM16 20v-7h4v7z'],
+    ['Rəqəmsal transformasiya', 'M7 7h10v10H7zM10 10h4v4h-4zM9 3v4M15 3v4M9 17v4M15 17v4M3 9h4M3 15h4M17 9h4M17 15h4']
+  ];
+  var D = [
+    ['T1. Halqa + kometalar', 'Halqa üzərində 3 parlaq kometa uzun işıq izi ilə fırlanır. Halqa həmişə canlı görünür.', { comets: 1 }],
+    ['T2. Halqa + BEA-dan şüalar', 'Mərkəzdəki BEA-dan hər xidmətə incə işıq xətti çəkilir, xətlər boyunca işıq zərrəcikləri axır. Məna: BEA bütün xidmətləri birləşdirir.', { spokes: 1 }],
+    ['T3. Qalaktika qurşağı', 'Halqa nazik xətt deyil, içi ulduz tozu ilə dolu enli parlaq qurşaqdır (Saturn halqası kimi).', { band: 1 }],
+    ['T4. Halqa + mərkəzdən dalğalar', 'BEA-dan çıxan yumşaq işıq dalğaları halqaya qədər yayılır, halqaya çatanda halqa bir anlıq parlayır.', { waves: 1 }],
+    ['T5. Birləşmə: şüalar + kometalar', 'T1 və T2 birlikdə: BEA-dan xidmətlərə axan işıq və halqada fırlanan kometalar. Ən dolğun variant.', { spokes: 1, comets: 1 }]
+  ];
+  function icon(d) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="' + d + '"/></svg>'; }
+  var g = document.getElementById('g'), demos = [], TAU = Math.PI * 2;
+  D.forEach(function (dd) {
+    var c = document.createElement('div'); c.className = 'c';
+    var demo = document.createElement('div'); demo.className = 'demo';
+    var cv = document.createElement('canvas'); demo.appendChild(cv);
+    var ov = document.createElement('div'); ov.className = 'ov';
+    ov.innerHTML = SV.map(function (s) { return '<div class="it"><span class="ic">' + icon(s[1]) + '</span><strong>' + s[0] + '</strong></div>'; }).join('');
+    demo.appendChild(ov);
+    var info = document.createElement('div'); info.className = 'info'; var b = document.createElement('b'); b.textContent = dd[0]; var sp = document.createElement('span'); sp.textContent = dd[1]; info.appendChild(b); info.appendChild(sp);
+    c.appendChild(demo); c.appendChild(info); g.appendChild(c);
+    var dust = []; for (var i = 0; i < (dd[2].band ? 900 : 420); i++) dust.push([Math.random() * TAU, (Math.random() - 0.5) * (dd[2].band ? 44 : 10), Math.random() * 1.2 + 0.4, Math.random() * 6]);
+    demos.push({ cv: cv, x: cv.getContext('2d'), its: Array.prototype.slice.call(ov.children), o: dd[2], dust: dust, pts: [] });
+  });
+  var stars = []; for (var i = 0; i < 60; i++) stars.push([Math.random(), Math.random(), Math.random() + 0.3, Math.random() * 6]);
+  /* BEA point cloud */
+  var oc = document.createElement('canvas'); oc.width = 200; oc.height = 80; var c2 = oc.getContext('2d');
+  c2.fillStyle = '#fff'; c2.font = "800 62px 'Plus Jakarta Sans', 'Arial Black', Arial, sans-serif"; c2.textAlign = 'center'; c2.textBaseline = 'middle'; c2.fillText('BEA', 100, 42);
+  var dat = c2.getImageData(0, 0, 200, 80).data, BEA = [];
+  for (var y = 0; y < 80; y += 2) for (var xx = 0; xx < 200; xx += 2) if (dat[(y * 200 + xx) * 4 + 3] > 128) BEA.push([xx - 100, y - 40, Math.random() * 6]);
+
+  function frame(n) {
+    var t = Math.max(0, n / 1000);
+    demos.forEach(function (d) {
+      try {
+        var W = d.cv.clientWidth, H = d.cv.clientHeight; if (!W) return;
+        if (d.cv.width !== W) { d.cv.width = W; d.cv.height = H; }
+        var x = d.x, cx = W / 2, cy = H / 2 + 6, rx = W * 0.4, ry = H * 0.36, o = d.o;
+        var gr = x.createRadialGradient(cx, cy, 0, cx, cy, W * 0.7); gr.addColorStop(0, '#2B1668'); gr.addColorStop(0.45, '#1A0D47'); gr.addColorStop(1, '#0B0626'); x.fillStyle = gr; x.fillRect(0, 0, W, H);
+        x.globalCompositeOperation = 'lighter';
+        stars.forEach(function (s) { x.fillStyle = 'rgba(255,255,255,' + (0.2 + 0.3 * (0.5 + 0.5 * Math.sin(t + s[3]))).toFixed(2) + ')'; x.fillRect(s[0] * W, s[1] * H, s[2], s[2]); });
+        function P(th, off) { off = off || 0; return [cx + (rx + off) * Math.cos(th), cy + (ry + off * 0.5) * Math.sin(th)]; }
+        /* band glow (T3) */
+        if (o.band) { x.strokeStyle = 'rgba(176,112,240,0.12)'; x.lineWidth = 46; x.beginPath(); x.ellipse(cx, cy, rx, ry, 0, 0, TAU); x.stroke(); x.strokeStyle = 'rgba(220,190,255,0.25)'; x.lineWidth = 1; x.beginPath(); x.ellipse(cx, cy, rx + 22, ry + 11, 0, 0, TAU); x.stroke(); x.beginPath(); x.ellipse(cx, cy, rx - 22, ry - 11, 0, 0, TAU); x.stroke(); }
+        /* the single ring: faint line + star dust */
+        x.strokeStyle = 'rgba(200,165,255,0.14)'; x.lineWidth = 1.2; x.beginPath(); x.ellipse(cx, cy, rx, ry, 0, 0, TAU); x.stroke();
+        var flash = 0;
+        if (o.waves) { var u = (t % 4) / 4; flash = u > 0.82 ? 1 - (u - 0.82) / 0.18 : 0; }
+        d.dust.forEach(function (q) { var th = q[0] + t * 0.03, p = P(th, q[1]), dp = (Math.sin(th) + 1) / 2; x.fillStyle = 'rgba(238,218,255,' + Math.min(1, (0.25 + 0.6 * dp) * (0.6 + 0.4 * Math.sin(t * 2 + q[3])) + flash * 0.5).toFixed(2) + ')'; x.beginPath(); x.arc(p[0], p[1], q[2] * (0.6 + 0.6 * dp), 0, TAU); x.fill(); });
+        /* waves from centre (T4) */
+        if (o.waves) { for (var w = 0; w < 2; w++) { var uu = ((t / 4) + w * 0.5) % 1; x.strokeStyle = 'rgba(210,170,255,' + (0.45 * (1 - uu)).toFixed(2) + ')'; x.lineWidth = 1.6; x.beginPath(); x.ellipse(cx, cy, 40 + (rx - 40) * uu, 18 + (ry - 18) * uu, 0, 0, TAU); x.stroke(); } }
+        /* item positions */
+        var pos = d.its.map(function (el, k) { var th = t * 0.06 + k * TAU / 5; return P(th); });
+        /* spokes (T2) */
+        if (o.spokes) pos.forEach(function (p, k) {
+          var lg = x.createLinearGradient(cx, cy, p[0], p[1]); lg.addColorStop(0, 'rgba(210,170,255,0)'); lg.addColorStop(0.3, 'rgba(210,170,255,0.22)'); lg.addColorStop(1, 'rgba(230,205,255,0.5)');
+          x.strokeStyle = lg; x.lineWidth = 1; x.beginPath(); x.moveTo(cx, cy); x.lineTo(p[0], p[1]); x.stroke();
+          for (var m = 0; m < 3; m++) { var uu = ((t * 0.5) + k * 0.13 + m / 3) % 1; x.fillStyle = 'rgba(245,230,255,' + Math.sin(uu * Math.PI).toFixed(2) + ')'; x.beginPath(); x.arc(cx + (p[0] - cx) * uu, cy + (p[1] - cy) * uu, 2, 0, TAU); x.fill(); }
+        });
+        /* comets (T1) */
+        if (o.comets) for (var cm = 0; cm < 3; cm++) { var head = t * 0.5 + cm * TAU / 3; for (var s = 0; s < 40; s++) { var th = head - s * 0.018, p = P(th), f = 1 - s / 40; x.fillStyle = 'rgba(250,240,255,' + (0.9 * f * f).toFixed(2) + ')'; x.beginPath(); x.arc(p[0], p[1], 0.6 + 2.6 * f, 0, TAU); x.fill(); } var hp = P(head); var h = x.createRadialGradient(hp[0], hp[1], 0, hp[0], hp[1], 14); h.addColorStop(0, 'rgba(230,200,255,.7)'); h.addColorStop(1, 'rgba(230,200,255,0)'); x.fillStyle = h; x.fillRect(hp[0] - 14, hp[1] - 14, 28, 28); }
+        /* BEA */
+        var hh = x.createRadialGradient(cx, cy, 0, cx, cy, 90); hh.addColorStop(0, 'rgba(176,96,224,.35)'); hh.addColorStop(1, 'rgba(176,96,224,0)'); x.fillStyle = hh; x.fillRect(cx - 90, cy - 90, 180, 180);
+        BEA.forEach(function (b) { var f = (b[0] + 100) / 200; x.fillStyle = 'rgba(' + Math.round(235 - 3 * f) + ',' + Math.round(218 - 110 * f) + ',' + Math.round(255 - 20 * f) + ',' + (0.55 + 0.4 * Math.sin(t * 3 + b[2])).toFixed(2) + ')'; x.beginPath(); x.arc(cx + b[0] * 0.8, cy + b[1] * 0.8, 1, 0, TAU); x.fill(); });
+        x.globalCompositeOperation = 'source-over';
+        d.its.forEach(function (el, k) {
+          var p = pos[k], w2 = el.offsetWidth, h2 = el.offsetHeight, dp = (Math.sin(t * 0.06 + k * TAU / 5) + 1) / 2;
+          var lx = Math.max(6, Math.min(W - w2 - 6, p[0] - w2 / 2)), ly = Math.max(6, Math.min(H - h2 - 6, p[1] - h2 / 2));
+          el.style.transform = 'translate(' + lx.toFixed(1) + 'px,' + ly.toFixed(1) + 'px) scale(' + (0.92 + 0.1 * dp).toFixed(3) + ')';
+          el.style.zIndex = Math.round(dp * 10);
+        });
+      } catch (err) { console.error(err); }
+    });
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

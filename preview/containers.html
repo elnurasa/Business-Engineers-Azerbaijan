@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="az">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Konteyner üslubları</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600&display=swap">
+<style>
+  :root{--grad:linear-gradient(135deg,#C080F0 0%,#7040C0 50%,#C43FBE 100%);--glass:linear-gradient(150deg,rgba(70,36,150,.82),rgba(28,14,78,.86))}
+  body{margin:0;background:#0B0626;color:#F2E8FF;font-family:Inter,system-ui,sans-serif;padding:24px}
+  h1{font:800 22px 'Plus Jakarta Sans',sans-serif;margin:0 0 6px}
+  p.s{margin:0 0 16px;color:#CDBDF0;font-size:14px}
+  .g{display:grid;grid-template-columns:repeat(auto-fit,minmax(520px,1fr));gap:18px}
+  .c{border:1px solid rgba(192,128,240,.35);border-radius:16px;overflow:hidden;background:#140B3A}
+  .demo{position:relative;width:100%;aspect-ratio:16/10;overflow:hidden}
+  .demo canvas{position:absolute;inset:0;width:100%;height:100%}
+  .ov{position:absolute;inset:0}
+  .it{position:absolute;left:0;top:0;will-change:transform;cursor:pointer}
+  .info{padding:12px 14px}
+  .info b{display:block;font:700 15px 'Plus Jakarta Sans',sans-serif;margin-bottom:4px}
+  .info span{font-size:13px;color:#CDBDF0;line-height:1.5}
+  svg.i{width:16px;height:16px}
+
+  /* S1 current glass card */
+  .s1{display:flex;align-items:center;gap:9px;width:178px;padding:7px 10px 7px 7px;border-radius:14px;background:var(--glass) padding-box,var(--grad) border-box;border:1px solid transparent;box-shadow:0 10px 26px rgba(4,2,18,.5)}
+  .s1 .ic{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#9050D0,#C43FBE);display:flex;align-items:center;justify-content:center;color:#fff;flex:none}
+  .s1 small{display:block;font:600 9px Inter;letter-spacing:.12em;color:#E7A9F2}
+  .s1 strong{display:block;font:600 12.5px/1.2 'Plus Jakarta Sans';color:#fff}
+
+  /* S2 planets */
+  .s2{display:flex;flex-direction:column;align-items:center;gap:6px;width:130px;text-align:center}
+  .s2 .orb{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;background:radial-gradient(circle at 32% 28%,#F6EBFF 0,#C080F0 30%,#7040C0 68%,#3A1A80 100%);box-shadow:0 0 0 6px rgba(192,128,240,.12),0 0 26px rgba(176,96,224,.6)}
+  .s2 .orb svg{width:20px;height:20px}
+  .s2 strong{font:600 12.5px/1.2 'Plus Jakarta Sans';color:#fff;text-shadow:0 2px 10px rgba(10,4,40,.9)}
+  .s2:hover .orb{box-shadow:0 0 0 8px rgba(192,128,240,.2),0 0 36px rgba(200,140,255,.9)}
+
+  /* S3 slim pill */
+  .s3{display:flex;align-items:center;gap:8px;padding:5px 14px 5px 5px;border-radius:30px;background:rgba(26,12,70,.7);border:1px solid rgba(200,160,255,.45);box-shadow:0 0 18px rgba(176,96,224,.35);white-space:nowrap}
+  .s3 .ic{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#9050D0,#C43FBE);display:flex;align-items:center;justify-content:center;color:#fff}
+  .s3 .ic svg{width:13px;height:13px}
+  .s3 strong{font:600 12.5px 'Plus Jakarta Sans';color:#fff}
+  .s3:hover{border-color:#fff;box-shadow:0 0 26px rgba(210,160,255,.7)}
+
+  /* S4 business card with accent bar and description */
+  .s4{width:168px;padding:10px 12px 11px;border-radius:12px;background:var(--glass);border:1px solid rgba(192,128,240,.3);box-shadow:0 12px 30px rgba(4,2,18,.55);position:absolute}
+  .s4::before{content:"";position:absolute;left:12px;right:12px;top:0;height:3px;border-radius:0 0 3px 3px;background:var(--grad)}
+  .s4 .n{font:800 18px 'Plus Jakarta Sans';background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .s4 strong{display:block;font:600 12.5px/1.2 'Plus Jakarta Sans';color:#fff;margin:2px 0 3px}
+  .s4 em{display:block;font:400 10.5px/1.35 Inter;font-style:normal;color:#CDBDF0}
+
+  /* S5 satellite node + label */
+  .s5{display:flex;align-items:center;gap:8px;white-space:nowrap}
+  .s5 .node{width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 0 0 4px rgba(192,128,240,.35),0 0 18px rgba(220,180,255,.9);flex:none}
+  .s5 .lab{padding:4px 10px;border-radius:8px;background:rgba(20,10,55,.75);border:1px solid rgba(192,128,240,.35)}
+  .s5 .lab small{display:block;font:600 8.5px Inter;letter-spacing:.12em;color:#E7A9F2}
+  .s5 .lab strong{font:600 12px 'Plus Jakarta Sans';color:#fff}
+
+  /* S6 hexagon badge */
+  .s6{display:flex;align-items:center;gap:9px;white-space:nowrap}
+  .s6 .hex{width:40px;height:44px;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);background:var(--grad);display:flex;align-items:center;justify-content:center;color:#fff;flex:none}
+  .s6 .hex svg{width:18px;height:18px}
+  .s6 strong{font:600 12.5px/1.2 'Plus Jakarta Sans';color:#fff;text-shadow:0 2px 10px rgba(10,4,40,.9)}
+</style>
+</head>
+<body>
+<h1>Orbitdə fırlanan konteynerlər üçün üslublar</h1>
+<p class="s">Hər birinin üzərinə kursorla gəlin. Fon və orbit indiki saytla eynidir.</p>
+<div class="g" id="g"></div>
+<script>
+(function () {
+  var SV = [
+    ['01', 'HR transformasiyası', 'Strategiya, model və HR sistemləri', 'M9 7m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M3 20v-1a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v1M16 4a3 3 0 0 1 0 6M21 20v-1a4 4 0 0 0-3-3.9'],
+    ['02', 'Təşkilati inkişaf', 'Struktur, rollar və mədəniyyət', 'M9 3h6v4H9zM12 7v4M5 15v-2a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2M3 15h4v4H3zM17 15h4v4h-4zM10 15h4v4h-4zM12 11v4'],
+    ['03', 'BPM', 'Proseslərin optimallaşdırılması', 'M4 12a8 8 0 0 1 14-5.3M20 4v4h-4M20 12a8 8 0 0 1-14 5.3M4 20v-4h4'],
+    ['04', 'Data analitika', 'Analitika və KPI panelləri', 'M4 20V10h4v10zM10 20V4h4v16zM16 20v-7h4v7z'],
+    ['05', 'Rəqəmsal transformasiya', 'Rəqəmsal strategiya və IT həllər', 'M7 7h10v10H7zM10 10h4v4h-4zM9 3v4M15 3v4M9 17v4M15 17v4M3 9h4M3 15h4M17 9h4M17 15h4']
+  ];
+  function icon(d) { return '<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="' + d + '"/></svg>'; }
+  var STY = [
+    ['S1. Hazırkı şüşə kart', 'Tünd şüşə, qradiyent haşiyə, ikon, nömrə və ad. Aydın və biznes üslubu.',
+      function (s) { return '<div class="it s1"><span class="ic">' + icon(s[3]) + '</span><span><small>' + s[0] + '</small><strong>' + s[1] + '</strong></span></div>'; }],
+    ['S2. Planetlər', 'Hər xidmət parlaq kiçik planetdir (ikon içində), adı altında. Qutu yoxdur, ən "kosmik" və yüngül.',
+      function (s) { return '<div class="it s2"><span class="orb">' + icon(s[3]) + '</span><strong>' + s[1] + '</strong></div>'; }],
+    ['S3. İncə kapsul', 'Tək sətirlik, incə, işıqlı kənarlı kapsul. Minimal və zərif, çox yer tutmur.',
+      function (s) { return '<div class="it s3"><span class="ic">' + icon(s[3]) + '</span><strong>' + s[1] + '</strong></div>'; }],
+    ['S4. Biznes kartı', 'Yuxarıda qradiyent zolaq, iri nömrə, ad və qısa təsvir. Ən çox məlumat verir.',
+      function (s) { return '<div class="it s4"><div class="n">' + s[0] + '</div><strong>' + s[1] + '</strong><em>' + s[2] + '</em></div>'; }],
+    ['S5. Peyk + etiket', 'Halqanın üstündə parlayan nöqtə (peyk) və yanında kiçik etiket. Orbit hissini ən dəqiq saxlayır.',
+      function (s) { return '<div class="it s5"><span class="node"></span><span class="lab"><small>' + s[0] + '</small><strong>' + s[1] + '</strong></span></div>'; }],
+    ['S6. Altıbucaqlı nişan', 'Loqo qradiyentində altıbucaqlı nişan (mühəndislik), yanında ad.',
+      function (s) { return '<div class="it s6"><span class="hex">' + icon(s[3]) + '</span><strong>' + s[1] + '</strong></div>'; }]
+  ];
+  var g = document.getElementById('g'), demos = [];
+  STY.forEach(function (st) {
+    var c = document.createElement('div'); c.className = 'c';
+    var demo = document.createElement('div'); demo.className = 'demo';
+    var cv = document.createElement('canvas'); demo.appendChild(cv);
+    var ov = document.createElement('div'); ov.className = 'ov'; ov.innerHTML = SV.map(st[2]).join(''); demo.appendChild(ov);
+    var info = document.createElement('div'); info.className = 'info'; var b = document.createElement('b'); b.textContent = st[0]; var sp = document.createElement('span'); sp.textContent = st[1]; info.appendChild(b); info.appendChild(sp);
+    c.appendChild(demo); c.appendChild(info); g.appendChild(c);
+    demos.push({ cv: cv, x: cv.getContext('2d'), its: Array.prototype.slice.call(ov.children), sat: st[0].indexOf('S5') === 0 });
+  });
+  var TAU = Math.PI * 2;
+  var dust = []; for (var i = 0; i < 260; i++) dust.push([Math.random() * TAU, (Math.random() - .5) * 10, Math.random() * 1.1 + .4]);
+  var stars = []; for (i = 0; i < 50; i++) stars.push([Math.random(), Math.random(), Math.random() + .3, Math.random() * 6]);
+  function frame(n) {
+    var t = Math.max(0, n / 1000);
+    demos.forEach(function (d) {
+      try {
+        var W = d.cv.clientWidth, H = d.cv.clientHeight; if (!W) return;
+        if (d.cv.width !== W) { d.cv.width = W; d.cv.height = H; }
+        var x = d.x, cx = W / 2, cy = H / 2 + 6, rx = W * 0.38, ry = H * 0.33;
+        var gr = x.createRadialGradient(cx, cy, 0, cx, cy, W * .7); gr.addColorStop(0, '#2B1668'); gr.addColorStop(.45, '#1A0D47'); gr.addColorStop(1, '#0B0626'); x.fillStyle = gr; x.fillRect(0, 0, W, H);
+        x.globalCompositeOperation = 'lighter';
+        stars.forEach(function (s) { x.fillStyle = 'rgba(255,255,255,' + (.2 + .3 * (.5 + .5 * Math.sin(t + s[3]))).toFixed(2) + ')'; x.fillRect(s[0] * W, s[1] * H, s[2], s[2]); });
+        dust.forEach(function (q) { var th = q[0] + t * .03, dd = (Math.sin(th) + 1) / 2; x.fillStyle = 'rgba(238,218,255,' + (.2 + .55 * dd).toFixed(2) + ')'; x.beginPath(); x.arc(cx + (rx + q[1]) * Math.cos(th), cy + (ry + q[1] * .5) * Math.sin(th), q[2] * (.6 + .6 * dd), 0, TAU); x.fill(); });
+        var h = x.createRadialGradient(cx, cy, 0, cx, cy, 60); h.addColorStop(0, 'rgba(176,96,224,.4)'); h.addColorStop(1, 'rgba(176,96,224,0)'); x.fillStyle = h; x.fillRect(cx - 60, cy - 60, 120, 120);
+        x.globalCompositeOperation = 'source-over';
+        x.font = "800 30px 'Plus Jakarta Sans', Arial"; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = 'rgba(240,222,255,.85)'; x.fillText('BEA', cx, cy);
+        d.its.forEach(function (el, k) {
+          var th = t * 0.06 + k * TAU / 5, ex = Math.cos(th), ey = Math.sin(th), depth = (ey + 1) / 2, sc = 0.9 + 0.12 * depth;
+          var px = cx + rx * ex, py = cy + ry * ey, w = el.offsetWidth, hh = el.offsetHeight;
+          var lx = px - w / 2, ly = py - hh / 2;
+          if (d.sat) { lx = px - 7; ly = py - hh / 2; if (ex < 0) lx = px - w + 7; el.style.flexDirection = ex < 0 ? 'row-reverse' : 'row'; }
+          lx = Math.max(6, Math.min(W - w - 6, lx)); ly = Math.max(6, Math.min(H - hh - 6, ly));
+          el.style.transform = 'translate(' + lx.toFixed(1) + 'px,' + ly.toFixed(1) + 'px) scale(' + sc.toFixed(3) + ')';
+          el.style.opacity = (0.82 + 0.18 * depth).toFixed(2); el.style.zIndex = Math.round(depth * 10);
+        });
+      } catch (err) { console.error(err); }
+    });
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
