@@ -21,7 +21,7 @@
   var cv = $('#orbitCv'), g2 = cv.getContext('2d'), labelsEl = $('#labels'), coreEl = $('#core');
   var W = 0, H = 0, cx = 0, cy = 0, narrow = false, dpr = 1, TAU = Math.PI * 2;
   var items = [], rings = [], dust = [], sparks = [], stars = [], ringDust = [], beaPts = [], beaP = [], coreHover = false, shocks = [], hotIdx = -1, bgGrad = null, vigGrad = null;
-  var selSlug = null, lastPill = null, navOn = false, introStart = performance.now(), cs = 160, topLimit = 90;
+  var selSlug = null, lastPill = null, navOn = false, introStart = performance.now(), cs = 160, topLimit = 90, short = false;
   var mouse = { tx: 0, ty: 0, x: 0, y: 0 };
   function rng(seed) { return function () { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }; }
   function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
@@ -94,26 +94,31 @@
   function hexA(hex, a) { var n = parseInt(hex.slice(1), 16); return 'rgba(' + (n >> 16) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')'; }
 
   function layout() {
-    W = window.innerWidth; H = window.innerHeight; narrow = W < 720;
+    W = window.innerWidth; H = window.innerHeight; narrow = W < 720; short = !narrow && H < 500;
     dpr = Math.min(2, window.devicePixelRatio || 1);
     cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
     g2.setTransform(dpr, 0, 0, dpr, 0, 0);
-    topLimit = narrow ? 80 : 96;
-    cx = W / 2; cy = narrow ? (topLimit + H) / 2 : H / 2 + 28;
+    topLimit = short ? 62 : narrow ? 80 : 96;
+    cx = W / 2; cy = (narrow || short) ? (topLimit + H) / 2 : H / 2 + 28;
     bgGrad = g2.createRadialGradient(cx, cy * 0.95, 0, cx, cy, Math.hypot(W, H) * 0.62);
     bgGrad.addColorStop(0, '#2B1668'); bgGrad.addColorStop(0.45, '#1A0D47'); bgGrad.addColorStop(1, '#0B0626');
     vigGrad = g2.createRadialGradient(cx, cy, Math.min(W, H) * 0.35, cx, cy, Math.hypot(W, H) * 0.62);
     vigGrad.addColorStop(0, 'rgba(150,90,235,0.16)'); vigGrad.addColorStop(1, 'rgba(150,90,235,0)');
     /* phones: all five share the outer ring (72 degrees apart); wider screens: 2 inner + 3 outer */
-    items.forEach(function (p, i) { p.tt.textContent = W < 980 ? SV[i].s : (SV[i].o || SV[i].t); var single = true; p.ring = single ? 1 : SV[i].r; p.k = single ? i : SV[i].k; });
+    items.forEach(function (p, i) { p.tt.textContent = (narrow || short) ? SV[i].s : (SV[i].o || SV[i].t); var single = true; p.ring = single ? 1 : SV[i].r; p.k = single ? i : SV[i].k; });
     items.forEach(function (p) { p.w = p.g.offsetWidth || 220; p.hh = p.g.offsetHeight || 64; });
     var bw = Math.max.apply(null, items.map(function (p) { return p.w; })), bh = Math.max.apply(null, items.map(function (p) { return p.hh; }));
-    cs = clamp(Math.min(W, H) * (narrow ? 0.26 : 0.21), narrow ? 92 : 124, 190);
+    cs = Math.min(clamp(Math.min(W, H) * (narrow ? 0.26 : 0.21), narrow ? 92 : 124, 190), H * 0.3);
     coreEl.style.left = cx + 'px'; coreEl.style.top = cy + 'px'; coreEl.style.width = cs + 'px'; coreEl.style.height = cs + 'px';
     buildBea();
 
     var A = narrow ? W / 2 - 34 : Math.min(W * 0.45, W / 2 - bw / 2 - 16);
-    var B = Math.max(60, Math.min(cy - topLimit - bh / 2 - 6, H - cy - bh / 2 - 14) / Math.cos(TILT));
+    var B = Math.max(60, Math.min(cy - topLimit - bh / 2 - 6, H - cy - bh / 2 - (narrow ? 30 : 14)) / Math.cos(TILT));
+    /* portrait phones and tablets: a round orbit spanning the screen width (projected radius equal in x and y) */
+    if (H > W && W < 1100) {
+      var Rc = Math.min(narrow ? W * 0.41 : W * 0.37, Math.min(cy - topLimit, H - cy) - bh / 2 - 12);
+      A = Rc; B = Rc / Math.cos(TILT);
+    }
     var a0 = Math.max(A * CFG[0].sc, cs / 2 + bw / 2 + 22), b0 = Math.max(B * CFG[0].sc, (cs / 2 + bh / 2 + 16) / Math.cos(TILT));
     a0 = Math.min(a0, A - (narrow ? 6 : 50)); b0 = Math.min(b0, B - bh * 1.1);
     var single = true;
@@ -307,7 +312,7 @@
     mouse.x += (mouse.tx - mouse.x) * 0.05; mouse.y += (mouse.ty - mouse.y) * 0.05;
     var ry = mouse.x * 0.08 + Math.sin(t * 0.1) * 0.05, rx = mouse.y * 0.06 + Math.sin(t * 0.08 + 1) * 0.03;
     cry = Math.cos(ry); sry = Math.sin(ry); crx = Math.cos(rx); srx = Math.sin(rx);
-    if (!navOn) {
+    if (!navOn && !(window.BEATeam && window.BEATeam.on())) {
       drawBg(t);
       g2.globalCompositeOperation = 'lighter';
       drawRings(t, ik); drawComets(t, ik); drawBea(t); drawDust(t, ik); drawShocks(dt);
@@ -348,32 +353,37 @@
   $('#svcCta').addEventListener('click', function () { closeSvc(false); openNav('contact'); });
 
   /* ---------- NAV SCENE ---------- */
-  var NAV = [{ id: 'about', t: 'Haqqımızda' }, { id: 'approach', t: 'Yanaşmamız' }, { id: 'faq', t: 'FAQ' }, { id: 'contact', t: 'Əlaqə' }];
+  var NAV = [{ id: 'about', t: 'Haqqımızda' }, { id: 'approach', t: 'Yanaşmamız' }, { id: 'clients', t: 'Müştərilərimiz' }, { id: 'faq', t: 'FAQ' }, { id: 'contact', t: 'Əlaqə' }];
+  /* client logos: { name, logo } — logo is an image path; without one the name is shown as a wordmark. Placeholders until the real list arrives */
+  var CLIENTS = [];
+  for (var ci = 1; ci <= 12; ci++) CLIENTS.push({ name: 'Loqo ' + ci, logo: '' });
   var navCur = 'about', chips = {}, arcLines = {};
   var navSvg = $('#navSvg'), navArcs = $('#navArcs'), navChips = $('#navChips'), navPanel = $('#navPanel');
   var scOrbit = $('#scene-orbit'), scNav = $('#scene-nav'), burger = $('#menu');
 
   function layoutNav() {
-    var w = window.innerWidth, hh = window.innerHeight, nr = w < 720;
+    var w = window.innerWidth, hh = window.innerHeight, nr = w < 720 || (w < 1100 && hh > w), tab = nr && w >= 720;
+    scNav.classList.toggle('compact', nr);
     navSvg.setAttribute('viewBox', '0 0 ' + w + ' ' + hh);
     clear(navArcs); clear(navChips); chips = {}; arcLines = {};
-    var cyN = nr ? hh * 0.2 : hh / 2;
-    var dy = nr ? hh * 0.068 : Math.min(hh * 0.16, 170);
+    var cf = nr ? (tab ? 18 : 15) : Math.max(16, Math.min(20, w / 100)), chH = Math.round(cf * 2.7);
+    var areaTop = tab ? 104 : 86, sheetTop = hh * 0.5 - 8;
+    var cyN = nr ? (areaTop + sheetTop) / 2 : hh / 2;
+    var dy = nr ? Math.max(30, (sheetTop - areaTop - chH - 16) / (NAV.length - 1)) : Math.min(hh * 0.48 / (NAV.length - 1), 170);
     var R0 = 1.5 * dy * 1.22, g = nr ? dy * 0.52 : dy * 0.56;
-    var cf = nr ? 15 : Math.max(16, Math.min(20, w / 100)), chH = Math.round(cf * 2.7);
     ctx.font = '500 ' + cf + 'px Fraunces, Georgia, serif';
     var maxRight = 0;
 
     if (!nr) [0.34, 0.5, 0.66].forEach(function (m) {
       el('circle', { cx: w * 0.98, cy: hh * 0.9, r: Math.min(w, hh) * m, fill: 'none', stroke: '#2F2160', 'stroke-width': 1.2 }, navArcs);
     });
-    [-0.9, 4, 5.2].forEach(function (m) {
+    [-0.9, NAV.length, NAV.length + 1.2].forEach(function (m) {
       var R = R0 + m * g; if (R < 40) return;
       el('path', { d: 'M0 ' + (cyN - R) + ' A ' + R + ' ' + R + ' 0 0 1 0 ' + (cyN + R), class: 'arc line', opacity: 0.5 }, navArcs);
     });
 
     NAV.forEach(function (n, i) {
-      var R = R0 + i * g, yy = cyN + (i - 1.5) * dy, xx = Math.sqrt(Math.max(R * R - (yy - cyN) * (yy - cyN), 0));
+      var R = R0 + i * g, yy = cyN + (i - (NAV.length - 1) / 2) * dy, xx = Math.sqrt(Math.max(R * R - (yy - cyN) * (yy - cyN), 0));
       var len = Math.PI * R, d = 'M0 ' + (cyN - R) + ' A ' + R + ' ' + R + ' 0 0 1 0 ' + (cyN + R);
       el('path', { d: d, class: 'arc band draw', 'stroke-width': chH * 1.5, style: '--len:' + len + ';--d:' + (0.1 + i * 0.12) + 's' }, navArcs);
       var line = el('path', { d: d, class: 'arc line draw' + (n.id === navCur ? ' on' : ''), style: '--len:' + len + ';--d:' + (0.1 + i * 0.12) + 's' }, navArcs);
@@ -407,7 +417,7 @@
       if (arcLines[n.id]) arcLines[n.id].classList.toggle('on', on);
     });
     clear(navPanel);
-    ({ about: renderAbout, approach: renderApproach, faq: renderFaq, contact: renderContact })[id]();
+    ({ about: renderAbout, approach: renderApproach, clients: renderClients, faq: renderFaq, contact: renderContact })[id]();
     if (animate) { navPanel.classList.remove('swap'); void navPanel.offsetWidth; navPanel.classList.add('swap'); }
   }
 
@@ -438,6 +448,27 @@
     var v = h('div', 'vals');
     D.values.forEach(function (x, i) { var d = h('div'); var b = h('b'); b.appendChild(h('i', '', String(i + 1))); b.appendChild(document.createTextNode(x.t)); d.appendChild(b); d.appendChild(h('p', '', x.d)); v.appendChild(d); });
     navPanel.appendChild(v);
+  }
+  function renderClients() {
+    navPanel.appendChild(h('p', 'eyebrow', 'Müştərilərimiz'));
+    navPanel.appendChild(h('h2', '', 'Birlikdə işlədiyimiz şirkətlər'));
+    navPanel.appendChild(h('p', '', 'Bankdan istehsalata qədər müxtəlif sektorlarda şirkətlərin insan, proses və data sistemlərini birlikdə qurmuşuq.'));
+    var st = h('div', 'stats');
+    [['40+', 'şirkət'], ['12', 'sektor'], ['100+', 'layihə']].forEach(function (x) { var d = h('div'); d.appendChild(h('b', '', x[0])); d.appendChild(h('span', '', x[1])); st.appendChild(d); });
+    navPanel.appendChild(st);
+    /* two rows drifting in opposite directions; each track holds the logos twice so the loop is seamless */
+    var half = Math.ceil(CLIENTS.length / 2);
+    [CLIENTS.slice(0, half), CLIENTS.slice(half)].forEach(function (row, r) {
+      var mq = h('div', 'marq' + (r ? ' rev' : '')), tr = h('div', 'track');
+      mq.setAttribute('role', 'list');
+      row.concat(row).forEach(function (c, j) {
+        var it = h('div', 'logo'); if (j >= row.length) it.setAttribute('aria-hidden', 'true'); else it.setAttribute('role', 'listitem');
+        if (c.logo) { var im = h('img'); im.src = c.logo; im.alt = c.name; im.loading = 'lazy'; it.appendChild(im); } else it.appendChild(h('span', '', c.name));
+        tr.appendChild(it);
+      });
+      tr.style.setProperty('--dur', Math.max(24, row.length * 5) + 's');
+      mq.appendChild(tr); navPanel.appendChild(mq);
+    });
   }
   function renderFaq() {
     navPanel.appendChild(h('p', 'eyebrow', 'Suallar və cavablar'));
@@ -481,6 +512,7 @@
   }
 
   function openNav(id) {
+    if (window.BEATeam) window.BEATeam.close(true);
     navOn = true; closeSvc(false);
     layoutNav(); showSection(id || navCur, false);
     scOrbit.classList.remove('on'); scNav.classList.add('on');
@@ -505,7 +537,16 @@
   var rt;
   window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { layout(); if (navOn) { layoutNav(); showSection(navCur, false); } }, 120); });
 
+  /* the team scene (team.js) closes the menu or a service panel before it opens */
+  window.BEAApp = { closeNav: function () { if (navOn) closeNav(); }, closeSvc: function () { closeSvc(false); } };
+
   scNav.inert = true;
+  /* deep links for review: ?nav=about|approach|faq|contact opens the menu scene, ?svc=1..5 opens a service panel */
+  (function () {
+    var q = new URLSearchParams(location.search), nv = q.get('nav'), sv = parseInt(q.get('svc'), 10);
+    if (nv && ['about', 'approach', 'clients', 'faq', 'contact'].indexOf(nv) >= 0) setTimeout(function () { openNav(nv); }, 600);
+    else if (sv >= 1 && sv <= items.length) setTimeout(function () { openSvc(items[sv - 1]); }, 1600);
+  })();
   layout();
   requestAnimationFrame(frame);
 })();

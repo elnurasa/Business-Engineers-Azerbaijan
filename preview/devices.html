@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="az">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cihaz önizləməsi</title>
+<style>
+  body{margin:0;background:#0B0626;color:#E9DEFF;font:500 13px Inter,system-ui,sans-serif;padding:16px}
+  .row{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start}
+  .dev{display:flex;flex-direction:column;gap:6px}
+  .frame{overflow:hidden;border:1px solid rgba(192,128,240,.45);border-radius:14px;background:#000}
+  iframe{border:0;display:block;transform-origin:0 0}
+</style>
+</head>
+<body>
+<div class="row" id="row"></div>
+<script>
+  var qs = new URLSearchParams(location.search), only = qs.get('only'), page = qs.get('page') || '';
+  var url = '../?embed&_=' + Date.now() + (page ? '&' + page : '');
+  var DEV = [['Telefon 390×844', 390, 844, .62], ['Kiçik telefon 360×740', 360, 740, .62], ['Planşet 768×1024', 768, 1024, .44], ['Planşet üfüqi 1024×768', 1024, 768, .44], ['Telefon üfüqi 844×390', 844, 390, .52]];
+  var row = document.getElementById('row');
+  DEV.forEach(function (d, di) {
+    if (only && only.split(',').indexOf(String(di)) < 0) return;
+    var w = document.createElement('div'); w.className = 'dev';
+    var l = document.createElement('div'); l.textContent = d[0];
+    var f = document.createElement('div'); f.className = 'frame'; f.style.width = Math.round(d[1] * d[3]) + 'px'; f.style.height = Math.round(d[2] * d[3]) + 'px';
+    var i = document.createElement('iframe'); i.src = url; i.width = d[1]; i.height = d[2]; i.style.transform = 'scale(' + d[3] + ')';
+    f.appendChild(i); w.appendChild(l); w.appendChild(f); row.appendChild(w);
+  });
+</script>
+</body>
+</html>
