@@ -355,8 +355,33 @@
   /* ---------- NAV SCENE ---------- */
   var NAV = [{ id: 'about', t: 'Haqqımızda' }, { id: 'approach', t: 'Yanaşmamız' }, { id: 'clients', t: 'Müştərilərimiz' }, { id: 'faq', t: 'FAQ' }, { id: 'contact', t: 'Əlaqə' }];
   /* client logos: { name, logo } — logo is an image path; without one the name is shown as a wordmark. Placeholders until the real list arrives */
-  var CLIENTS = [];
-  for (var ci = 1; ci <= 12; ci++) CLIENTS.push({ name: 'Loqo ' + ci, logo: '' });
+  var CC = 'assets/clients/';
+  /* mark: true = the logo is only a symbol, so the name is written under it; no logo = the name is shown as a wordmark */
+  var CLIENTS = [
+    { name: 'Veysəloğlu Şirkətlər Qrupu', logo: CC + 'veyseloglu.svg' },
+    { name: 'Paşa Sığorta', logo: CC + 'pasha-sigorta.svg' },
+    { name: 'Paşa Bank', logo: CC + 'pasha-bank.svg', mark: true },
+    { name: 'Sirab', logo: CC + 'sirab.svg' },
+    { name: 'Avrora Şirkətlər Qrupu', logo: CC + 'avrora.svg' },
+    { name: 'MLK Construction', logo: '' },
+    { name: 'AKAD / TLC Group Construction', logo: CC + 'tlc-group.webp' },
+    { name: 'CanPa MMC', logo: '' },
+    { name: 'Azerconnect Group', logo: CC + 'azerconnect.webp' },
+    { name: 'Sağlam Ailə', logo: CC + 'saglam-aile.webp' },
+    { name: 'Atena Group MMC', logo: CC + 'atena.webp' },
+    { name: 'SOCAR', logo: CC + 'socar.webp' },
+    { name: 'Oven MMC', logo: CC + 'oven.webp' },
+    { name: 'Turan Bank', logo: CC + 'turan-bank.webp' },
+    { name: 'Baku Electronics', logo: CC + 'baku-electronics.webp', mark: true },
+    { name: 'Marxal Resort Hotel', logo: CC + 'marxal.webp' },
+    { name: 'Focus Optika', logo: CC + 'focus-optika.webp', mark: true },
+    { name: 'Landau Education Group', logo: CC + 'landau.svg', mark: true },
+    { name: 'Neptun Supermarket', logo: CC + 'neptun.webp' },
+    { name: 'Araz Supermarket', logo: CC + 'araz.svg' },
+    { name: 'OBA Supermarket', logo: CC + 'oba.svg' },
+    { name: 'Təhsil Nazirliyi', logo: CC + 'tehsil.webp', mark: true },
+    { name: 'Mazarina Group', logo: CC + 'mazarina.webp' }
+  ];
   var navCur = 'about', chips = {}, arcLines = {};
   var navSvg = $('#navSvg'), navArcs = $('#navArcs'), navChips = $('#navChips'), navPanel = $('#navPanel');
   var scOrbit = $('#scene-orbit'), scNav = $('#scene-nav'), burger = $('#menu');
@@ -454,7 +479,7 @@
     navPanel.appendChild(h('h2', '', 'Birlikdə işlədiyimiz şirkətlər'));
     navPanel.appendChild(h('p', '', 'Bankdan istehsalata qədər müxtəlif sektorlarda şirkətlərin insan, proses və data sistemlərini birlikdə qurmuşuq.'));
     var st = h('div', 'stats');
-    [['40+', 'şirkət'], ['12', 'sektor'], ['100+', 'layihə']].forEach(function (x) { var d = h('div'); d.appendChild(h('b', '', x[0])); d.appendChild(h('span', '', x[1])); st.appendChild(d); });
+    [[String(CLIENTS.length), 'şirkət'], ['12', 'sektor']].forEach(function (x) { var d = h('div'); d.appendChild(h('b', '', x[0])); d.appendChild(h('span', '', x[1])); st.appendChild(d); });
     navPanel.appendChild(st);
     /* two rows drifting in opposite directions; each track holds the logos twice so the loop is seamless */
     var half = Math.ceil(CLIENTS.length / 2);
@@ -463,7 +488,10 @@
       mq.setAttribute('role', 'list');
       row.concat(row).forEach(function (c, j) {
         var it = h('div', 'logo'); if (j >= row.length) it.setAttribute('aria-hidden', 'true'); else it.setAttribute('role', 'listitem');
-        if (c.logo) { var im = h('img'); im.src = c.logo; im.alt = c.name; im.loading = 'lazy'; it.appendChild(im); } else it.appendChild(h('span', '', c.name));
+        if (c.logo) {
+          var im = h('img'); im.src = c.logo; im.alt = c.name; im.loading = 'lazy'; it.appendChild(im);
+          if (c.mark) { it.classList.add('mark'); it.appendChild(h('small', '', c.name)); }
+        } else it.appendChild(h('span', '', c.name));
         tr.appendChild(it);
       });
       tr.style.setProperty('--dur', Math.max(24, row.length * 5) + 's');

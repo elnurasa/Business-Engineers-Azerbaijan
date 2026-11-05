@@ -588,3 +588,12 @@ button.core.ring:focus-visible{outline:2px dashed rgba(230,200,255,.7);outline-o
 .marq .logo span{font:600 14px var(--fh);color:#CDBBF2;letter-spacing:.02em;text-align:center}
 @media (max-width:719px){.marq .logo{width:120px;height:58px;border-radius:14px}.marq .track{gap:10px}}
 @media (prefers-reduced-motion:reduce){.marq{-webkit-mask-image:none;mask-image:none}.marq .track{animation:none;flex-wrap:wrap;width:auto}.marq .logo[aria-hidden]{display:none}}
+/* ===== v23: real client logos sit on light tiles (they are drawn for white backgrounds) ===== */
+.marq .logo{background:rgba(255,255,255,.94);border-color:rgba(255,255,255,.5);flex-direction:column;gap:4px;padding:10px 16px;width:168px;height:78px}
+.marq .logo:hover{background:#fff;border-color:rgba(235,190,255,.9);box-shadow:0 0 22px rgba(190,120,255,.4)}
+.marq .logo img{width:100%;height:100%;min-height:0;filter:none;opacity:.92;transition:opacity .3s,transform .3s}
+.marq .logo:hover img{opacity:1;transform:scale(1.04)}
+.marq .logo.mark img{height:calc(100% - 15px)}
+.marq .logo small{font:500 10.5px var(--fb);color:#4A3A86;line-height:1.1;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.marq .logo span{color:#2D1F6B;font-size:13px;line-height:1.25}
+@media (max-width:719px){.marq .logo{width:136px;height:66px;padding:8px 12px}}
